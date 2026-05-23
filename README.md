@@ -21,7 +21,6 @@ A personal homelab built from scratch in VirtualBox using two Debian VMs — a h
 - [Firewall Rules (ufw)](#-firewall-rules-ufw)
 - [User Accounts & Privilege Separation](#-user-accounts--privilege-separation)
 - [Step-by-Step Setup Guide](#-step-by-step-setup-guide)
-- [Lessons Learned & Gotchas](#-lessons-learned--gotchas)
 - [Prerequisites](#-prerequisites)
 
 ---
