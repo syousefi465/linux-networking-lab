@@ -240,7 +240,7 @@ Follow these steps in order to reproduce this lab from scratch.
 2. Download Debian ISO: https://www.debian.org/download
 3. Create VM-1 (Server):
    - Name: debian-server | Type: Linux | Version: Debian (64-bit)
-   - RAM: 1024 MB | Storage: 20 GB (VDI, dynamic)
+   - RAM: 1024 MB (2048 / 4096 MB recommended) | Storage: 20 GB (VDI, dynamic)
    - Adapter 1: NAT
    - Adapter 2: Host-only Adapter → vboxnet0
 4. Install Debian (minimal, no desktop environment)
