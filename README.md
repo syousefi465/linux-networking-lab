@@ -315,18 +315,6 @@ ss -tlnp
 
 ---
 
-## 💡 Lessons Learned & Gotchas
-
-| # | Gotcha | What Happened | Fix |
-|---|--------|---------------|-----|
-| 1 | **ufw locked me out** | Enabled ufw before allowing SSH port | Always run `ufw allow 2222` first, then `ufw enable` |
-| 2 | **SSH still on port 22** | Edited wrong config file | Confirm you're editing `/etc/ssh/sshd_config`, not `ssh_config` |
-| 3 | **Key copy failed** | `ssh-copy-id` used default port 22 | Always pass `-p 2222` with a custom SSH port |
-| 4 | **Host-only adapter had no IP** | Interface not configured in `/etc/network/interfaces` | Manually add static IP block for `enp0s8` |
-| 5 | **stduser could still attempt SSH** | `AllowUsers` not set | Add `AllowUsers adminuser` to `sshd_config` and restart SSH |
-
-
----
 
 ## ✅ Prerequisites
 
