@@ -32,17 +32,17 @@ A personal homelab built from scratch in VirtualBox using two Debian VMs — a h
   ┌────────────────────────────────────────────────────┐
   │                   HOST MACHINE                     │
   │                                                    │
-  │   ┌─────────────────┐     ┌─────────────────┐     │
-  │   │   VM-1: SERVER  │     │   VM-2: CLIENT  │     │
-  │   │   (Debian)      │     │   (Debian)      │     │
-  │   │                 │     │                 │     │
-  │   │ Adapter 1: NAT  │     │ Adapter 1: NAT  │     │
-  │   │ (internet)      │     │ (internet)      │     │
-  │   │                 │     │                 │     │
-  │   │ Adapter 2:      │─────│ Adapter 2:      │     │
-  │   │ Host-only       │     │ Host-only       │     │
-  │   │ 192.168.56.10   │     │ 192.168.56.20   │     │
-  │   └─────────────────┘     └─────────────────┘     │
+  │   ┌─────────────────┐     ┌─────────────────┐      │
+  │   │   VM-1: SERVER  │     │   VM-2: CLIENT  │      │
+  │   │   (Debian)      │     │   (Debian)      │      │
+  │   │                 │     │                 │      │
+  │   │ Adapter 1: NAT  │     │ Adapter 1: NAT  │      │
+  │   │ (internet)      │     │ (internet)      │      │
+  │   │                 │     │                 │      │
+  │   │ Adapter 2:      │─────│ Adapter 2:      │      │
+  │   │ Host-only       │     │ Host-only       │      │
+  │   │ 192.168.56.10   │     │ 192.168.56.20   │      │
+  │   └─────────────────┘     └─────────────────┘      │
   │              Host-only Network: vboxnet0           │
   │              Subnet: 192.168.56.0/24               │
   └────────────────────────────────────────────────────┘
@@ -58,14 +58,13 @@ A personal homelab built from scratch in VirtualBox using two Debian VMs — a h
 |------------------|-------------------------------|-------------------------------|
 | **Hostname**     | `debian-server`               | `debian-client`               |
 | **OS**           | Debian 12 (Bookworm)          | Debian 12 (Bookworm)          |
-| **RAM**          | 1024 MB                       | 1024 MB                       |
+| **RAM**          | 1024 MB (2048 MB recommended) | 1024 MB (2048 MB recommended) |
 | **Storage**      | 20 GB (VDI, dynamically alloc)| 20 GB (VDI, dynamically alloc)|
 | **Adapters**     | NAT + Host-only               | NAT + Host-only               |
 | **NAT IP**       | 10.0.2.15 (DHCP)              | 10.0.2.15 (DHCP)              |
 | **Host-only IP** | 192.168.56.10 (static)        | 192.168.56.20 (static)        |
-| **SSH Port**     | `<YOUR_CUSTOM_PORT>`          | N/A                           |
+| **SSH Port**     | `2222`                        | N/A                           |
 
-> 📝 Update the table above with your actual specs, RAM, and custom SSH port.
 
 ---
 
@@ -115,8 +114,8 @@ All hardening is applied to the **server VM** via `/etc/ssh/sshd_config`.
 | Directive              | Default Value | Hardened Value        | Why                                      |
 |------------------------|---------------|-----------------------|------------------------------------------|
 | `PermitRootLogin`      | `yes`         | `no`                  | Blocks direct root login over SSH        |
-| `PasswordAuthentication` | `yes`       | `no`                  | Forces key-based auth only               |
-| `Port`                 | `22`          | `<YOUR_CUSTOM_PORT>`  | Reduces automated scan noise             |
+| `PasswordAuthentication` `yes`         | `no`                  | Forces key-based auth only               |
+| `Port`                 | `22`          | `22222`               | Reduces automated scan noise             |
 | `AllowUsers`           | *(not set)*   | `adminuser`           | Whitelists only authorised users         |
 | `MaxAuthTries`         | `6`           | `3`                   | Limits brute-force attempts per session  |
 
@@ -147,12 +146,12 @@ Run the following on the **client VM**:
 ssh-keygen -t ed25519 -C "lab-client"
 
 # Copy the public key to the server
-ssh-copy-id -i ~/.ssh/id_ed25519.pub -p <YOUR_CUSTOM_PORT> adminuser@192.168.56.10
+ssh-copy-id -i ~/.ssh/id_ed25519.pub -p 2222 adminuser@192.168.56.10
 ```
 
 Test the connection:
 ```bash
-ssh -p <YOUR_CUSTOM_PORT> adminuser@192.168.56.10
+ssh -p 2222 adminuser@192.168.56.10
 ```
 
 > ✅ If you connect without a password prompt, key-based auth is working.
@@ -171,7 +170,7 @@ sudo ufw default deny incoming
 sudo ufw default allow outgoing
 
 # Allow SSH on the custom port only
-sudo ufw allow <YOUR_CUSTOM_PORT>/tcp comment 'SSH hardened port'
+sudo ufw allow 2222/tcp comment 'SSH hardened port'
 
 # Enable the firewall
 sudo ufw enable
@@ -189,7 +188,7 @@ Default: deny (incoming), allow (outgoing), disabled (routed)
 
 To                         Action      From
 --                         ------      ----
-<YOUR_CUSTOM_PORT>/tcp     ALLOW IN    Anywhere
+2222/tcp                  ALLOW IN    Anywhere
 ```
 
 > ⚠️ Always allow your SSH port **before** enabling ufw to avoid locking yourself out.
@@ -202,7 +201,7 @@ Two accounts are maintained on the server VM:
 
 | Username      | Role          | sudo Access | SSH Access | Notes                              |
 |---------------|---------------|-------------|------------|------------------------------------|
-| `adminuser`   | Administrator | Full (`sudo`)| ✅ Yes    | Whitelisted in `AllowUsers`        |
+| `adminuser`   | Administrator | Full(`sudo`)| ✅ Yes     | Whitelisted in `AllowUsers`        |
 | `stduser`     | Standard      | None        | ❌ No      | Day-to-day unprivileged operations |
 
 ### Creating the Accounts
@@ -285,7 +284,7 @@ sudo systemctl restart ssh
 ```bash
 # On client
 ssh-keygen -t ed25519 -C "lab-client"
-ssh-copy-id -i ~/.ssh/id_ed25519.pub -p <PORT> adminuser@192.168.56.10
+ssh-copy-id -i ~/.ssh/id_ed25519.pub -p 2222 adminuser@192.168.56.10
 ```
 
 ### Phase 6 — Firewall
@@ -293,7 +292,7 @@ ssh-copy-id -i ~/.ssh/id_ed25519.pub -p <PORT> adminuser@192.168.56.10
 ```bash
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-sudo ufw allow <PORT>/tcp comment 'SSH'
+sudo ufw allow 2222/tcp comment 'SSH'
 sudo ufw enable
 sudo ufw status verbose
 ```
@@ -302,7 +301,7 @@ sudo ufw status verbose
 
 ```bash
 # From client — SSH into server
-ssh -p <PORT> adminuser@192.168.56.10
+ssh -p 2222 adminuser@192.168.56.10
 
 # From server — check firewall
 sudo ufw status verbose
@@ -320,13 +319,12 @@ ss -tlnp
 
 | # | Gotcha | What Happened | Fix |
 |---|--------|---------------|-----|
-| 1 | **ufw locked me out** | Enabled ufw before allowing SSH port | Always run `ufw allow <PORT>` first, then `ufw enable` |
+| 1 | **ufw locked me out** | Enabled ufw before allowing SSH port | Always run `ufw allow 2222` first, then `ufw enable` |
 | 2 | **SSH still on port 22** | Edited wrong config file | Confirm you're editing `/etc/ssh/sshd_config`, not `ssh_config` |
-| 3 | **Key copy failed** | `ssh-copy-id` used default port 22 | Always pass `-p <PORT>` with a custom SSH port |
+| 3 | **Key copy failed** | `ssh-copy-id` used default port 22 | Always pass `-p 2222` with a custom SSH port |
 | 4 | **Host-only adapter had no IP** | Interface not configured in `/etc/network/interfaces` | Manually add static IP block for `enp0s8` |
 | 5 | **stduser could still attempt SSH** | `AllowUsers` not set | Add `AllowUsers adminuser` to `sshd_config` and restart SSH |
 
-> 📝 Add your own gotchas here as you discover them — this section grows with your experience.
 
 ---
 
@@ -335,21 +333,9 @@ ss -tlnp
 | Tool / Resource | Version / Link |
 |-----------------|---------------|
 | VirtualBox | 7.x — [virtualbox.org](https://www.virtualbox.org/) |
-| Debian ISO | 12 (Bookworm) — [debian.org](https://www.debian.org/download) |
+| Debian ISO | 13  — [debian.org](https://www.debian.org/download) |
 | Host OS | Windows / macOS / Linux |
 | Terminal (client) | Any SSH-capable terminal |
-
----
-
-## 📁 Repository Structure
-
-```
-linux-networking-lab/
-├── README.md          ← This file — full lab documentation
-└── configs/
-    ├── sshd_config    ← Hardened SSH daemon config (sanitised)
-    └── ufw-rules.txt  ← ufw rule export
-```
 
 ---
 
