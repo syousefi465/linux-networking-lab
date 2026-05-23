@@ -19,7 +19,7 @@ A hands-on home lab built with VirtualBox on Windows, running two Debian VMs con
 ## 🗺️ Network Topology
 
 ```
-┌─────────────────────────┐        Internal Network (labnet)        ┌─────────────────────────┐
+┌─────────────────────────┐        Internal Network (labnet)         ┌─────────────────────────┐
 │      debian-server      │ ◄──────────────────────────────────────► │      debian-client      │
 │   192.168.56.10         │                                          │   192.168.56.20         │
 │                         │                                          │                         │
