@@ -1,5 +1,5 @@
 # 🖧 Linux & Networking Lab Environment
-![YouTube]([https://youtube.com](https://youtu.be/3nYW67MnOsA?si=lRPSBYC3IDvte8Lg))
+![YouTube]([https://youtu.be/3nYW67MnOsA?si=lRPSBYC3IDvte8Lg])
 
 A hands-on home lab built with VirtualBox on Windows, running two Debian VMs configured to simulate a real server/client infrastructure. Covers SSH hardening, firewall configuration, user privilege separation, and internal network setup.
 
